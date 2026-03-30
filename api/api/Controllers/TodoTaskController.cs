@@ -18,9 +18,10 @@ public class TodoTaskController: ControllerBase
     private readonly IUserService _userService;
     private readonly ITodoTaskService _todoTaskService;
 
-    public TodoTaskController(ITodoTaskService todoTaskService, IMapper todoTaskMapper)
+    public TodoTaskController(ITodoTaskService todoTaskService, IMapper todoTaskMapper, IUserService userService)
     {
-        _mapper = todoTaskMapper; 
+        _mapper = todoTaskMapper;
+        _userService = userService;
         _todoTaskService = todoTaskService; 
     }
 
@@ -29,12 +30,16 @@ public class TodoTaskController: ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TodoTaskDto>> CreateTask([FromBody] CreateTodoTaskDto createTaskDto)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine("UserId: " + userId);
-        
+        var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return BadRequest(new { message = "User not authenticated" });
+        }
+
         TodoTask newTodoTask = _mapper.Map<TodoTask>(createTaskDto);
-        User userIssuer = await _userService.GetUserById(int.Parse(userId));
-        newTodoTask.CreatedBy = userIssuer;
+        User userIssuer = await _userService.GetUserByEmail(userEmail);
+        newTodoTask.UserId = userIssuer.Id;
         
         TodoTask createdTodoTask = await _todoTaskService.CreateTask(newTodoTask);
         Console.WriteLine(JsonSerializer.Serialize(createdTodoTask));

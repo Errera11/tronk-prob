@@ -34,6 +34,5 @@ public class UserService: IUserService
         var user = await _userContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
 
         return user;
-
     }
 }

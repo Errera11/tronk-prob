@@ -34,5 +34,7 @@ public class TodoTask
 
     public bool? IsCompleted { get; set; } = false;
     
-    public User CreatedBy { get; set; }
+    public int UserId { get; set; }
+    
+    public User CreatedBy { get; set; } = null!;
 }
