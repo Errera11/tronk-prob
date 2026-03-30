@@ -32,7 +32,10 @@ public class AuthController: ControllerBase
         
         if (existingUser != null)
         {
-            return BadRequest("Email already exists");
+            return BadRequest(new
+            {
+                message = "Email already exists"
+            });
         }
         
         var hashedPassword = _authService.HashPassword(newUser.Password);
@@ -58,13 +61,19 @@ public class AuthController: ControllerBase
         User? existingUser = await _userService.GetUserByEmail(newUser.Email);
         if (existingUser == null)
         {
-            return BadRequest("Invalid credentials");
+            return BadRequest(new
+            {
+                message = "Invalid credentials"
+            });
         }
 
         var isValidPassword = _authService.VerifyPassword(existingUser.Password, userDto.password);
         if (!isValidPassword)
         {
-            return BadRequest("Invalid credentials");
+            return BadRequest(new
+            {
+                message = "Invalid credentials"
+            });
         }
         
         UserDto userResponseDto = _mapper.Map<UserDto>(existingUser);
