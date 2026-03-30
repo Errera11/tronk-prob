@@ -1,0 +1,91 @@
+# This .gitignore file is for .NET Core / .NET 5+ projects
+
+# Visual Studio / Rider files
+.vs/
+*.suo
+*.user
+*.userprefs
+*.pdb # Debugging symbols, typically not needed in source control
+
+# Build artifacts
+bin/
+obj/
+publish/
+.DS_Store # macOS specific
+*.log # General log files
+*.stackdump
+
+# NuGet packages
+packages/
+*.nupkg
+.nuget/nuget.g.props
+.nuget/nuget.g.targets
+
+# Test results
+TestResults/
+*.trx
+
+# Rider specific files
+.idea/ # Rider solution-level settings
+*.csproj.user # User-specific project settings
+*.sln.DotSettings # Solution-specific settings (sometimes useful to commit)
+# You might want to commit .sln.DotSettings.user if it contains team-wide settings,
+# but usually it's for personal preferences.
+*.csproj.DotSettings.user
+*.fsproj.DotSettings.user
+*.vbproj.DotSettings.user
+
+# Git history (if you're using git-history for large files, otherwise git handles it)
+.githistory
+
+# Dependency directories (node_modules, bower_components, etc., if applicable)
+node_modules/
+bower_components/
+
+# Local SQL Server files
+*.mdf
+*.ldf
+
+# Local SQLite database files
+*.db # Matches files like todo.db
+*.sqlite
+*.sqlite3
+
+# ASP.NET Core specific
+appsettings*.Development.json # Often contains sensitive local configuration (e.g., local connection strings, API keys)
+appsettings*.Production.json # Also sensitive, though less likely to be present directly in source
+appsettings*.json.user # User-specific settings for appsettings
+
+# User secrets (sensitive configuration)
+.microsoft/usersecrets/
+
+# Docker build context (if you have local build contexts)
+.dockerignore
+DockerFile.develop
+docker-compose.yml.user
+
+# Static web assets (often generated at build time)
+wwwroot/dist/
+wwwroot/lib/
+
+# Miscellaneous
+Thumbs.db # Windows thumbnail cache
+ehthumbs.db # Windows thumbnail cache
+*.pid # Process ID files
+*.stats # Statistics files
+
+# Crash reports
+*.dmp # Windows crash dumps
+hs_err_pid*.log # JVM crash logs (if you integrate with Java)
+
+# Certificate files
+*.pfx
+*.cer
+*.snk
+
+# Editor-specific files (e.g., VS Code)
+.vscode/
+
+# Environment Variables file (like for DotNetEnv package)
+.env
+.env.*
