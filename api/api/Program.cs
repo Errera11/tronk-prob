@@ -9,6 +9,16 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()  
+            .AllowAnyMethod()   
+            .AllowAnyHeader(); 
+    });
+});
+
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -50,6 +60,8 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization(); 
 
@@ -60,5 +72,4 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
 app.Run();
