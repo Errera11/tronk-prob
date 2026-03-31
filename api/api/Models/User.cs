@@ -13,7 +13,7 @@ public class UserContext: DbContext
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
-        DbPath = System.IO.Path.Join(path, "todo.db");
+        DbPath = System.IO.Path.Join(AppContext.BaseDirectory, "todo.db");
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)

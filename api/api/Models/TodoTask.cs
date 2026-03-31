@@ -12,8 +12,7 @@ public class TodoTaskContext: DbContext
     public TodoTaskContext(DbContextOptions<TodoTaskContext> options) : base(options)
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        DbPath = System.IO.Path.Join(path, "todo.db");
+        DbPath = System.IO.Path.Join(AppContext.BaseDirectory, "todo.db");
         Console.WriteLine($"Using {DbPath}");
     }
     
