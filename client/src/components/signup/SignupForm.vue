@@ -15,8 +15,10 @@ const form = reactive<LoginFormProps>({
   rememberMe: false,
 })
 
-function onSubmit() {
-  mutateAsync(form)
+async function onSubmit() {
+  await mutateAsync(form)
+
+  navigateTo({ name: AppRoutesEnum.home })
 }
 function onReset() {}
 </script>
