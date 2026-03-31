@@ -4,15 +4,15 @@ namespace api.Dto;
 
 public class TodoTaskDto
 {
-    public int id { get; }
+    public int id { get; set;  }
     
-    public string title { get; }
+    public string title { get; set; }
     
-    public string description { get; }
+    public string description { get; set; }
     
-    public DateTime dueDate { get; }
+    public DateTime dueDate { get; set; }
     
-    public bool isCompleted { get; }
+    public bool isCompleted { get; set;}
     
-    public User createdBy { get; }
+    public UserDto createdBy { get;set;}
 }

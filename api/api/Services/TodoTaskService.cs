@@ -1,3 +1,5 @@
+using System.Text.Json;
+using api.Common;
 using api.Dto;
 using api.Interfaces;
 using api.Models;
@@ -14,9 +16,45 @@ public class TodoTaskService: ITodoTaskService
         _todoTaskContext = context;
     }
     
-    public async Task<List<TodoTask>> GetTaskList()
+    public async Task<TodoTask> GetTaskById(int todoTaskId)
     {
-        return await _todoTaskContext.TodoTasks.ToListAsync();
+        return await _todoTaskContext.TodoTasks
+            .Include(t => t.CreatedBy)
+            .FirstOrDefaultAsync(t => t.Id == todoTaskId);
+    }
+    
+    public async Task<PagedResponse<TodoTask>> GetTaskList(TodoTaskQueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+
+        var query = _todoTaskContext.TodoTasks.AsNoTracking().AsQueryable();
+
+        query = query.ApplySearch(filter.Search);
+        
+       query = query.ApplyStatusFilter(filter.Status);
+
+        var totalRecords = await query.CountAsync(cancellationToken);
+
+        var todoTasks = await query
+            .ApplyPagination(pageNumber, pageSize)
+            .AsQueryable()
+            .Select(t => new TodoTask {Id = t.Id,
+                Title = t.Title,
+                CreatedBy = t.CreatedBy, 
+                IsCompleted = t.IsCompleted,
+                DueDate = t.DueDate,
+                Description = t.Description})
+            .ToListAsync(cancellationToken);
+
+        return new PagedResponse<TodoTask>
+        {
+            Data = todoTasks,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        };
     }
 
     public async Task<TodoTask> CreateTask(TodoTask todoTask)
@@ -30,9 +68,13 @@ public class TodoTaskService: ITodoTaskService
 
     public async Task<TodoTask> UpdateTask(TodoTask todoTask)
     {
-        var existingTask = await _todoTaskContext.TodoTasks.FindAsync(todoTask.Id);
-
-        _todoTaskContext.Entry(existingTask).CurrentValues.SetValues(todoTask);
+        var existingTask = await _todoTaskContext.TodoTasks
+            .FindAsync(todoTask.Id);
+        
+        existingTask.Title = todoTask.Title;
+        existingTask.Description = todoTask.Description;
+        existingTask.DueDate = todoTask.DueDate;
+        existingTask.IsCompleted = todoTask.IsCompleted;
 
         await _todoTaskContext.SaveChangesAsync();
 

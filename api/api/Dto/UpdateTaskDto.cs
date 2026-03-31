@@ -8,5 +8,5 @@ public class UpdateTaskDto
     
     public DateTime dueDate { get; set; }
     
-    public bool is_completed { get; set; } = false;
+    public bool isCompleted { get; set; } = false;
 }

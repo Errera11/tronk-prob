@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using api.Common;
 using api.Dto;
 using api.Interfaces;
 using api.Models;
@@ -49,19 +50,26 @@ public class TodoTaskController: ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<TodoTask>>> GetTasks()
+    public async Task<ActionResult<PagedResponse<TodoTaskDto>>> GetTasks([FromQuery] TodoTaskQueryFilter filter, CancellationToken cancellationToken)
     {
-        List<TodoTask> taskList = await _todoTaskService.GetTaskList();
+        PagedResponse<TodoTask> paginatedData = await _todoTaskService.GetTaskList(filter, cancellationToken);
 
-        var taskDtoList = _mapper.Map<List<TodoTaskDto>>(taskList);
-
-        return Ok(taskDtoList);
+        var response = new PagedResponse<TodoTaskDto>
+        {
+            Data = _mapper.Map<List<TodoTaskDto>>(paginatedData.Data),
+            PageNumber = paginatedData.PageNumber,
+            PageSize = paginatedData.PageSize,
+            TotalRecords = paginatedData.TotalRecords,
+            TotalPages = paginatedData.TotalPages
+        };
+        
+        return Ok(response);
     }
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<TodoTask>> UpdateTask(int id, [FromBody] UpdateTaskDto updateTaskDto)
+    public async Task<ActionResult<TodoTaskDto>> UpdateTask(int id, [FromBody] UpdateTaskDto updateTaskDto)
     {
         TodoTask newTodoTask = new TodoTask
         {
@@ -69,12 +77,12 @@ public class TodoTaskController: ControllerBase
             Description = updateTaskDto.description,
             Title = updateTaskDto.title,
             DueDate = updateTaskDto.dueDate,
-            IsCompleted = updateTaskDto.is_completed 
+            IsCompleted = updateTaskDto.isCompleted 
         };
         
         TodoTask updatedTask = await _todoTaskService.UpdateTask(newTodoTask);
         
-        var taskDto = _mapper.Map<List<TodoTaskDto>>(updatedTask);
+        var taskDto = _mapper.Map<TodoTaskDto>(updatedTask);
         
         return Ok(_mapper.Map<TodoTaskDto>(taskDto));
     }
@@ -86,15 +94,27 @@ public class TodoTaskController: ControllerBase
     {
         var deletedTaskId = await _todoTaskService.DeleteTask(id);
 
-        return deletedTaskId;
+        return Ok(deletedTaskId);
     }
     
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public Task<TodoTask> GetTaskById()
+    public async Task<ActionResult<TodoTaskDto>> GetTaskById(int id)
     {
-        throw new NotImplementedException();
+        var task = await _todoTaskService.GetTaskById(id);
+
+        if (task == null)
+        {
+            return NotFound(new
+            {
+                message = "Task not found"
+            });
+        }
+
+        var taskDto = _mapper.Map<TodoTaskDto>(task);
+        
+        return Ok(taskDto);
     }
 
 }

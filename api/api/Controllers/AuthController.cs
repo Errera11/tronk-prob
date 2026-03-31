@@ -80,13 +80,5 @@ public class AuthController: ControllerBase
         var tokenString = _authService.GenerateJSONWebToken(userResponseDto);
         
         return Ok(new { AccessToken = tokenString , user = userResponseDto });
-}
-    
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<UserDto>> GetUserById()
-    {
-        throw new NotImplementedException();
     }
 }
